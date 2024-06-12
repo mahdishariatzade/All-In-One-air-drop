@@ -92,5 +92,3 @@ def create_client(sessionString, api_id, api_hash, admin, cexio_ref_code):
     cex_io_url = cache_db.get('cex_io_url')
 
     client.disconnect()
-
-    print(f"\n\nSession {session_name} added and saved successfully! 🎉\n\n")
