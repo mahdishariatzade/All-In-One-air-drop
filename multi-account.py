@@ -13,6 +13,8 @@ from scripts.logger import setup_custom_logger
 from scripts.cache_data import SimpleCache
 from scripts.tg_client import create_client
 
+from tools.configs import *
+
 from telethon.sync import TelegramClient
 from telethon.sessions import StringSession
 from telethon import functions, types, events, Button, errors
@@ -24,25 +26,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 logger = setup_custom_logger("mainapp")
 executor = ThreadPoolExecutor(5)
-
-
-with open('config.json') as f:
-    data = json.load(f)
-    api_id = data['api_id']
-    api_hash = data['api_hash']
-    admin = data['admin']
-    bot_token = data['bot_token']
-    auto_upgrade = data['auto_upgrade']
-    max_tap_level = data['max_tap_level']
-    max_charge_level = data['max_charge_level']
-    max_energy_level = data['max_energy_level']
-    max_days_for_return = data['max_days_for_return']
-
-    cexio_clicker = data['cexio_clicker']
-    tapswap_clicker = data['tapswap_clicker']
-    hamster_clicker = data['hamster_clicker']
-
-    cexio_ref_code = data['cexio_ref_code']
 
 
 if not os.path.exists('sessions'):
