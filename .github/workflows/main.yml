@@ -1,8 +1,6 @@
 name: Release autoclicker for Docker
 on:
   push:
-    tags:
-      - "*"
   workflow_dispatch:
 
 jobs:
