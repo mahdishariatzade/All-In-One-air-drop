@@ -33,9 +33,6 @@ def getAppUrl(client: TelegramClient, bot: str, platform: str = "ios", start_par
 
 
 def create_client(sessionString, api_id, api_hash, admin, cexio_ref_code):
-    session_name = input(
-        "Please enter a unique name for the session (like: session_25 or you can enter phone number):  ")
-
     client = TelegramClient(
         StringSession(sessionString),
         api_id,
