@@ -10,7 +10,7 @@ with open('config.json') as f:
     data = json.load(f)
     api_id = getenv_json_config('api_id')
     api_hash = getenv_json_config('api_hash')
-    sessionString = getenv_json_config('sessionString')
+    # sessionString = getenv_json_config('sessionString')
     admin = int(getenv_json_config('admin'))
     version = getenv_json_config('version')
     auto_upgrade = getenv_json_config('auto_upgrade')
