@@ -22,4 +22,4 @@ with open('config.json') as f:
     tapswap_clicker = getenv_json_config('tapswap_clicker')
     hamster_clicker = getenv_json_config('hamster_clicker')
     cexio_ref_code = getenv_json_config('cexio_ref_code')
-    cexio_ref_code = getenv_json_config('bot_token')
+    bot_token = getenv_json_config('bot_token')
