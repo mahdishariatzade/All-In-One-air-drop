@@ -5,7 +5,6 @@ import time
 import random
 import cloudscraper
 import sys
-import js2py
 
 from bs4 import BeautifulSoup
 from scripts.BypassTLS import BypassTLSv1_3
@@ -32,7 +31,7 @@ class TapSwap:
         self.x_cv              = "615"
         self.access_token      = ""
         self.update_token_time = 0
-        
+                
         self.headers = {
             "accept": "*/*",
             "accept-language": "en-US,en;q=0.9,fa;q=0.8",
@@ -67,21 +66,23 @@ class TapSwap:
             self.logger.error("[!] We ran into trouble with the get auth token! 🚫 The script is stopping.")
             sys.exit()
     
-    def run_code_and_calculate_result(self, code):
-        x = JSCodeProcessor(code)
-        return x.execute_js_code()
-    
     def extract_chq_result(self, chq):
-        len_value = len(chq)
-        bytes_array = bytearray(len_value // 2)
-        x = 157
         
-        for t in range(0, len_value, 2):
-            bytes_array[t // 2] = int(chq[t:t + 2], 16)
+        headers = {
+            'Content-Type': 'application/json'
+        }
         
-        xored = bytearray(t ^ x for t in bytes_array)
-        decoded = xored.decode('utf-8')
-        return self.run_code_and_calculate_result(decoded)
+        session = requests.Session()
+        session.mount("https://", BypassTLSv1_3())
+        session.headers = headers
+        scraper = cloudscraper.create_scraper(sess=session)
+        
+        r = scraper.post('https://api.g-ai.trade:2053/chq', json={'code': chq}, headers=headers).json()
+        
+        if 'result' in r:
+            return r['result']
+        
+        return False
 
     def get_auth_token(self):
         
@@ -103,6 +104,7 @@ class TapSwap:
                     headers=self.headers,
                     data=json.dumps(payload)
                 ).json()
+                
                 
                                 
                 if 'wait_s' in response:
@@ -405,56 +407,4 @@ class TapSwap:
         return self.balance
     
     def time_to_recharge(self):
-        return self._time_to_recharge + random.randint(60*1, 60*6)
-
-class JSCodeProcessor:
-    def __init__(self, js_code):
-        self.js_code = js_code
-        self.data = None
-        self.codes = {}
-        self.code_to_run = ""
-
-    def extract_data(self):
-        data = "h['innerHTML']" + self.js_code.split("h['innerHTML']")[1].split('}()));function a()')[0].replace(';', ';\n\n').replace("'+'", '')
-        data = data.replace('\\x20', ' ').replace('\\x22', '"')
-        self.data = data
-        return data
-
-    def parse_html(self):
-        if self.data is None:
-            self.extract_data()
-        soup = BeautifulSoup(self.data, 'html.parser')
-        div_elements = soup.find_all('div')
-        for div in div_elements:
-            if 'id' in div.attrs and '_v' in div.attrs:
-                self.codes[div['id']] = div['_v']
-        
-        return self.codes
-
-    def build_js_code(self):
-        if not self.codes:
-            self.parse_html()
-
-        cjk = self.data.split('var i=')[1].split(';')[0].split(',')
-        code_to_run = "function() {"
-        for k, v in self.codes.items():
-            if k in cjk[0]:
-                i = v
-                code_to_run += f"i={v};\n"
-            if k in cjk[1]:
-                j = v
-                code_to_run += f"j={v};\n"
-
-        code_to_run += cjk[2] + ";\n"
-        r = 'return ' + self.data.split('return')[1].split(';')[0] + ';}'
-        code_to_run += r
-
-        self.code_to_run = code_to_run
-        return code_to_run
-
-    def execute_js_code(self):
-        if not self.code_to_run:
-            self.build_js_code()
-
-        r = js2py.eval_js(self.code_to_run)
-        return r()
+        return self._time_to_recharge + random.randint(60*1, 60*5)
