@@ -1,42 +1,31 @@
 import asyncio
-import json
-import os
-import time
-import aiocron
-import psutil
-import sys
-
-from scripts.tapswap import TapSwap
-from scripts.hamster import HamsterCombat
-from scripts.cexio import Cex_IO
-from scripts.logger import setup_custom_logger
-from scripts.cache_data import SimpleCache
-from scripts.tg_client import create_client
-
-from tools.configs import *
-
-from telethon.sync import TelegramClient
-from telethon.sessions import StringSession
-from telethon import functions, types, events, Button, errors
-
-from threading import Thread
 import concurrent.futures
+import platform
+import subprocess
+import sys
+import time
 from concurrent.futures import ThreadPoolExecutor
 
+import aiocron
+import psutil
+from telethon import events
+from telethon.sync import TelegramClient
 
+from scripts.cache_data import SimpleCache
+from scripts.hamster import HamsterCombat
+from scripts.logger import setup_custom_logger
+from scripts.tg_client import create_client
+from tools.configs import *
 
-
-logger   = setup_custom_logger("mainapp")
+logger = setup_custom_logger("mainapp")
 executor = ThreadPoolExecutor(15)
 
 if not os.path.exists('sessions'):
     os.mkdir('sessions')
 
-
 accounts = os.getenv('accounts').split(',')
 for session in accounts:
     create_client(session, api_id, api_hash, admin, cexio_ref_code)
-
 
 client = TelegramClient('sessions/robot', api_id, api_hash)
 client.start(bot_token=bot_token)
@@ -48,15 +37,16 @@ db = {
 clickers = {}
 url_files = [f for f in os.listdir('cache') if f.endswith('.json')]
 
-
-VERSION    = "1.1"
+VERSION = "1.1"
 START_TIME = time.time()
 
+
 def convert_time(uptime):
-    hours   = int(uptime // 3600)
+    hours = int(uptime // 3600)
     minutes = int((uptime % 3600) // 60)
 
     return (hours if hours > 0 else 0), minutes
+
 
 def hamster_do_tasks():
     def task(file):
@@ -75,6 +65,7 @@ def hamster_do_tasks():
         results = list(executor.map(task, url_files))
     return results
 
+
 def daily_cipher(cipher: str):
     def task(file):
         client_id = file.split('.json')[0]
@@ -91,6 +82,7 @@ def daily_cipher(cipher: str):
     with concurrent.futures.ThreadPoolExecutor(10) as executor:
         results = list(executor.map(task, url_files))
     return results
+
 
 def daily_combo():
     def task(file):
@@ -110,6 +102,7 @@ def daily_combo():
 
     return results
 
+
 def buy_card(item: str):
     def task(file):
         client_id = file.split('.json')[0]
@@ -128,24 +121,23 @@ def buy_card(item: str):
     return results
 
 
-
 def total_balance():
     tapswap = 0
     hamster = 0
-    cexio   = 0
+    cexio = 0
     hamster_earn_per_hour = 0
     data = ""
-    
+
     for file in url_files:
         client_id = file.split('.json')[0]
         cache_db = SimpleCache(client_id)
-        
+
         try:
             tapswap += float(cache_db.get('tapswap_balance'))
             data += f"User: `{client_id}` | 🟣 TapSwap: `{convert_big_number(float(cache_db.get('tapswap_balance')))}`\n"
         except:
             pass
-        
+
         try:
             hamster += float(cache_db.get('hamster_balance'))
             hamster_earn_per_hour += float(cache_db.get('hamster_earn_per_hour'))
@@ -153,20 +145,22 @@ def total_balance():
             data += f"User: `{client_id}` | 🐹 Hamster PPH: `{convert_big_number(float(cache_db.get('hamster_earn_per_hour')))}`\n"
         except:
             pass
-        
+
         try:
             cexio += float(cache_db.get('cex_io_balance'))
             data += f"User: `{client_id}` | ❣️Cex IO: `{convert_big_number(float(cache_db.get('cex_io_balance')))}`\n\n"
         except:
             pass
-    
+
     return tapswap, hamster, cexio, hamster_earn_per_hour, data
 
+
 def convert_uptime(uptime):
-    hours   = int(uptime // 3600)
+    hours = int(uptime // 3600)
     minutes = int((uptime % 3600) // 60)
 
     return (hours if hours > 0 else 0), minutes
+
 
 def convert_big_number(num):
     suffixes = ['', 'Thousand', 'Million', 'Billion', 'Trillion', 'Quadrillion', 'Quintillion']
@@ -174,24 +168,25 @@ def convert_big_number(num):
     if num == 0:
         return '0'
 
-    num_abs   = abs(num)
+    num_abs = abs(num)
     magnitude = 0
 
     while num_abs >= 1000:
-        num_abs   /= 1000
+        num_abs /= 1000
         magnitude += 1
 
     formatted_num = '{:.2f}'.format(num_abs).rstrip('0').rstrip('.')
 
     return '{} {}'.format(formatted_num, suffixes[magnitude])
 
+
 def get_server_usage():
-    memory      = psutil.virtual_memory()
-    mem_usage   = memory.used / 1e6
-    mem_total   = memory.total / 1e6
+    memory = psutil.virtual_memory()
+    mem_usage = memory.used / 1e6
+    mem_total = memory.total / 1e6
     mem_percent = memory.percent
     cpu_percent = psutil.cpu_percent()
-    
+
     return {
         'memory_usage_MB': mem_usage,
         'memory_total_MB': mem_total,
@@ -199,54 +194,56 @@ def get_server_usage():
         'cpu_percent': cpu_percent
     }
 
+
 def split_string_by_length(input_string, chunk_length):
     return [input_string[i:i + chunk_length] for i in range(0, len(input_string), chunk_length)]
-        
+
 
 async def answer(event):
     global db, db_steps
-    
-    text:str = event.raw_text
+
+    text: str = event.raw_text
     user_id = event.sender_id
-    
+
     if user_id < 1 or not user_id in [admin]:
         return
-    
+
     if text == '/start':
-        await event.reply('👋 Welcome to the Clickers Management Bot! 🤖\n\nTo view the menu, send the command /help. 😉')
-    
+        await event.reply(
+            '👋 Welcome to the Clickers Management Bot! 🤖\n\nTo view the menu, send the command /help. 😉')
+
     elif text == '/ping':
         await event.reply('I am online! 🌐')
-    
+
     elif text == '/claim_daily_combo':
         m = await event.reply('It might take some time ⏳.')
         daily_combo()
         await m.edit('🚀 Your request has been sent.')
-    
+
     elif text.startswith('/cipher '):
         cipher = text.split('/cipher ')[1]
         m = await event.reply('It might take some time ⏳.')
         daily_cipher(cipher)
         await m.edit('🚀 Your request has been sent.')
-    
+
     elif text.startswith('/click '):
         stats = text.split('/click ')[1]
         if not stats in ['off', 'on']:
             await event.reply('❌ Bad Command!')
             return
-        
+
         db['click'] = stats
         if stats == 'on':
             await event.reply('✅ Mining Started!')
         else:
             await event.reply('💤 Mining turned off!')
-    
+
     elif text.startswith('/buy '):
         item = text.split('/buy ')[1]
         m = await event.reply('It might take some time ⏳.')
         buy_card(item)
         await m.edit('🚀 Your request has been sent.')
-        
+
     elif text == '/balance':
         m = await event.reply('Calculating the inventory. It might take some time ⏳.')
         tapswap, hamster, cexio, hamster_earn_per_hour, data = total_balance()
@@ -258,20 +255,20 @@ Total inventories:
 🔗 Total CEX IO:  `{convert_big_number(cexio)}`
 
 🐹 Total Hamster Earn Per Hour:  `{convert_big_number(hamster_earn_per_hour)}`
-🐹 Total Hamster Earn Per Day:   `{convert_big_number(hamster_earn_per_hour*24)}`
+🐹 Total Hamster Earn Per Day:   `{convert_big_number(hamster_earn_per_hour * 24)}`
 """)
-    
+
     elif text == '/help':
         su = get_server_usage()
 
-        mem_usage   = su['memory_usage_MB']
-        mem_total   = su['memory_total_MB']
+        mem_usage = su['memory_usage_MB']
+        mem_total = su['memory_total_MB']
         mem_percent = su['memory_percent']
         cpu_percent = su['cpu_percent']
-        
-        _uptime            = time.time() - START_TIME
-        _hours, _minutes   = convert_uptime(_uptime)
-        _clicker_stats     = "ON 🟢" if db['click'] == 'on' else "OFF 🔴"
+
+        _uptime = time.time() - START_TIME
+        _hours, _minutes = convert_uptime(_uptime)
+        _clicker_stats = "ON 🟢" if db['click'] == 'on' else "OFF 🔴"
 
         await event.reply(f"""
 🤖 Welcome to All-In-One (MA) Collector Bot!
@@ -309,14 +306,12 @@ Coded By: @uPaSKaL | GitHub: [Poryaei](https://github.com/Poryaei)
                           """)
 
     elif text == '/version':
-        await event.reply(f"ℹ️ Version: {VERSION}\n\nCoded By: @uPaSKaL | GitHub: [Poryaei](https://github.com/Poryaei)")
-    
+        await event.reply(
+            f"ℹ️ Version: {VERSION}\n\nCoded By: @uPaSKaL | GitHub: [Poryaei](https://github.com/Poryaei)")
+
     elif text == '/stop':
         await event.reply('👋')
         sys.exit()
-
-
-create_clickers()
 
 @aiocron.crontab('*/1 * * * *')
 async def send_taps():
@@ -332,8 +327,7 @@ async def send_taps():
         command = " ".join([python_command, "send_taps.py"])
         subprocess.Popen(command, shell=True)
         await client.send_message(admin, "Start Tapping ⛏️")
-    
-    
+
 
 @aiocron.crontab('0 */12 * * *')
 async def do_tasks():
