@@ -1,262 +1,158 @@
 import asyncio
-import json
-import os
-import time
-import aiocron
-import psutil
-import sys
-
-from scripts.tapswap import TapSwap
-from scripts.hamster import HamsterCombat
-from scripts.cexio import Cex_IO
-from scripts.logger import setup_custom_logger
-from scripts.cache_data import SimpleCache
-from scripts.tg_client import create_client
-
-from tools.configs import *
-
-from telethon.sync import TelegramClient
-from telethon.sessions import StringSession
-from telethon import functions, types, events, Button, errors
-
-from threading import Thread
 import concurrent.futures
+import platform
+import subprocess
+import sys
+import time
 from concurrent.futures import ThreadPoolExecutor
 
+import aiocron
+import psutil
+from telethon import events
+from telethon.sync import TelegramClient
+
+from scripts.cache_data import SimpleCache
+from scripts.hamster import HamsterCombat
+from scripts.logger import setup_custom_logger
+from scripts.tg_client import create_client
+from tools.configs import *
 
 logger = setup_custom_logger("mainapp")
-executor = ThreadPoolExecutor(5)
-
+executor = ThreadPoolExecutor(15)
 
 if not os.path.exists('sessions'):
     os.mkdir('sessions')
-
 
 accounts = os.getenv('accounts').split(',')
 for session in accounts:
     create_client(session, api_id, api_hash, admin, cexio_ref_code)
 
-
 client = TelegramClient('sessions/robot', api_id, api_hash)
 client.start(bot_token=bot_token)
 
 db = {
-    'click': 'on'
+    'click': 'on',
+    'start': False
 }
 clickers = {}
+url_files = [f for f in os.listdir('cache') if f.endswith('.json')]
 
-
-VERSION = "1.0.0"
+VERSION = "1.1"
 START_TIME = time.time()
 
 
-def create_clickers():
-    global clickers
+def convert_time(uptime):
+    hours = int(uptime // 3600)
+    minutes = int((uptime % 3600) // 60)
 
-    logger.info('Start connecting the clickers! 💻🔗')
-    url_files = [f for f in os.listdir('cache') if f.endswith('.json')]
-    tasks = []
-
-    def connect(file):
-        try:
-            client_id = file.split('.json')[0]
-            cache_db = SimpleCache(client_id)
-
-            tapswap_url = cache_db.get('tapswap_url')
-            hamster_url = cache_db.get('hamster_url')
-            cex_io_url = cache_db.get('cex_io_url')
-
-            tapswap_client = TapSwap(
-                tapswap_url, auto_upgrade, max_charge_level, max_energy_level, max_tap_level, client_id)
-            hamster_client = HamsterCombat(
-                hamster_url, max_days_for_return, client_id)
-            cex_io_client = Cex_IO(cex_io_url, client_id)
-
-            clickers[client_id] = {
-                'tapswap': tapswap_client,
-                'hamster': hamster_client,
-                'cexio': cex_io_client,
-                'next_tap': 0
-            }
-        except Exception as e:
-            logger.error(f'Error in building client[{file}]: ' + str(e))
-
-    for file in url_files:
-        tasks.append(executor.submit(connect, file))
-
-    for t in tasks:
-        t.result()
-
-    logger.info(f'{len(clickers)} clients have been successfully prepared.')
-    return clickers
-
-
-def start_clickers():
-    global clickers
-
-    tasks = []
-
-    def click(clicker, client_id):
-        tapswap_client = clicker['tapswap']
-        hamster_client = clicker['hamster']
-        cex_io_client = clicker['cexio']
-        next_tap = clicker['next_tap']
-
-        if tapswap_clicker == "on":
-
-            if time.time() > next_tap:
-                try:
-                    Thread(target=tapswap_client.click_all).start()
-                    time_to_recharge = tapswap_client.time_to_recharge()
-                    clickers[client_id]['next_tap'] = time.time() + \
-                        time_to_recharge
-                    logger.info(
-                        f"User: {client_id} | Sleeping: {time_to_recharge} seconds ...")
-                except Exception as e:
-                    time_to_recharge = 0
-                    logger.warning(
-                        f"User: {client_id} | Error in click all: " + str(e))
-
-        if cexio_clicker == "on":
-            try:
-                if cex_io_client.farms_end_time() < 1:
-                    cex_io_client.check_for_clicks()
-            except Exception as e:
-                logger.warning(
-                    f"User: {client_id} | Error in Cex_IO Click: " + str(e))
-
-        if hamster_clicker == "on":
-            try:
-                if time.time() > hamster_client.sleep_time:
-                    Thread(target=hamster_client.tap_all).start()
-                Thread(target=hamster_client.update_all).start()
-            except Exception as e:
-                logger.warning(
-                    f"User: {client_id} | Error in Hamster Click: " + str(e))
-
-    for client_id, clicker in clickers.items():
-        tasks.append(executor.submit(click, clicker, client_id))
-
-    for t in tasks:
-        t.result()
+    return (hours if hours > 0 else 0), minutes
 
 
 def hamster_do_tasks():
-    global clickers
-
-    for client_id, clicker in clickers.items():
-
-        hamster_client = clicker['hamster']
+    def task(file):
+        client_id = file.split('.json')[0]
+        cache_db = SimpleCache(client_id)
+        hamster_url = cache_db.get('hamster_url')
         try:
+            hamster_client = HamsterCombat(hamster_url, max_days_for_return, client_id)
             hamster_client.do_tasks()
+            return f"User: {client_id} | Tasks done"
         except Exception as e:
-            logger.warning(
-                f"User: {client_id} | Error in Hamster Tasks: " + str(e))
+            logger.warning(f"User: {client_id} | Error in Hamster Tasks: " + str(e))
+            return f"User: {client_id} | Error: {str(e)}"
+
+    with concurrent.futures.ThreadPoolExecutor(10) as executor:
+        results = list(executor.map(task, url_files))
+    return results
 
 
 def daily_cipher(cipher: str):
-    global clickers
-
-    for client_id, clicker in clickers.items():
-
-        hamster_client = clicker['hamster']
+    def task(file):
+        client_id = file.split('.json')[0]
+        cache_db = SimpleCache(client_id)
+        hamster_url = cache_db.get('hamster_url')
         try:
+            hamster_client = HamsterCombat(hamster_url, max_days_for_return, client_id)
             hamster_client.claim_daily_cipher(cipher)
+            return f"User: {client_id} | Daily cipher claimed"
         except Exception as e:
-            logger.warning(
-                f"User: {client_id} | Error in Hamster Daily Cipher: " + str(e))
+            logger.warning(f"User: {client_id} | Error in Hamster Daily Cipher: " + str(e))
+            return f"User: {client_id} | Error: {str(e)}"
+
+    with concurrent.futures.ThreadPoolExecutor(10) as executor:
+        results = list(executor.map(task, url_files))
+    return results
 
 
 def daily_combo():
-    global clickers
-
-    for client_id, clicker in clickers.items():
-
-        hamster_client = clicker['hamster']
+    def task(file):
+        client_id = file.split('.json')[0]
+        cache_db = SimpleCache(client_id)
+        hamster_url = cache_db.get('hamster_url')
         try:
+            hamster_client = HamsterCombat(hamster_url, max_days_for_return, client_id)
             hamster_client.claim_daily_combo()
+            return f"User: {client_id} | Daily combo claimed"
         except Exception as e:
-            logger.warning(
-                f"User: {client_id} | Error in Hamster Daily Combo: " + str(e))
+            logger.warning(f"User: {client_id} | Error in Hamster Daily Combo: " + str(e))
+            return f"User: {client_id} | Error: {str(e)}"
+
+    with concurrent.futures.ThreadPoolExecutor(10) as executor:
+        results = list(executor.map(task, url_files))
+
+    return results
 
 
 def buy_card(item: str):
-    global clickers
-
-    for client_id, clicker in clickers.items():
-
-        hamster_client = clicker['hamster']
+    def task(file):
+        client_id = file.split('.json')[0]
+        cache_db = SimpleCache(client_id)
+        hamster_url = cache_db.get('hamster_url')
         try:
-            hamster_client.upgrade_item(item)
+            hamster_client = HamsterCombat(hamster_url, max_days_for_return, client_id)
+            r = hamster_client.upgrade_item(item)
+            return f"User: {client_id} | Card bought: {r}"
         except Exception as e:
-            logger.warning(
-                f"User: {client_id} | Error in Hamster buy card: " + str(e))
+            logger.warning(f"User: {client_id} | Error in Hamster buy card: " + str(e))
+            return f"User: {client_id} | Error: {str(e)}"
 
-
-def retrieve_tapswap(client_id, tapswap_client):
-    try:
-        return float(tapswap_client.shares())
-    except Exception as e:
-        logger.error(
-            f'User: {client_id} | Error in retrieving balance in TapSwap: ' + str(e))
-        return 0
-
-
-def retrieve_hamster(client_id, hamster_client):
-    try:
-        balance = float(hamster_client.balance_coins())
-        earn_per_hour = float(hamster_client.earn_passive_per_hour)
-        return balance, earn_per_hour
-    except Exception as e:
-        logger.error(
-            f'User: {client_id} | Error in retrieving balance in Hamster: ' + str(e))
-        return 0, 0
-
-
-def retrieve_cexio(client_id, cex_io_client):
-    try:
-        return float(cex_io_client.balance())
-    except Exception as e:
-        logger.error(
-            f'User: {client_id} | Error in retrieving balance in CEX.IO: ' + str(e))
-        return 0
+    with concurrent.futures.ThreadPoolExecutor(10) as executor:
+        results = list(executor.map(task, url_files))
+    return results
 
 
 def total_balance():
-    global clickers
-
     tapswap = 0
     hamster = 0
     cexio = 0
     hamster_earn_per_hour = 0
+    data = ""
 
-    with concurrent.futures.ThreadPoolExecutor(5) as executor:
-        futures = []
+    for file in url_files:
+        client_id = file.split('.json')[0]
+        cache_db = SimpleCache(client_id)
 
-        for client_id, clicker in clickers.items():
-            tapswap_client = clicker['tapswap']
-            hamster_client = clicker['hamster']
-            cex_io_client = clicker['cexio']
+        try:
+            tapswap += float(cache_db.get('tapswap_balance'))
+            data += f"User: `{client_id}` | 🟣 TapSwap: `{convert_big_number(float(cache_db.get('tapswap_balance')))}`\n"
+        except:
+            pass
 
-            futures.append(executor.submit(
-                retrieve_tapswap, client_id, tapswap_client))
-            futures.append(executor.submit(
-                retrieve_hamster, client_id, hamster_client))
-            futures.append(executor.submit(
-                retrieve_cexio, client_id, cex_io_client))
+        try:
+            hamster += float(cache_db.get('hamster_balance'))
+            hamster_earn_per_hour += float(cache_db.get('hamster_earn_per_hour'))
+            data += f"User: `{client_id}` | 🐹 Hamster: `{convert_big_number(float(cache_db.get('hamster_balance')))}`\n"
+            data += f"User: `{client_id}` | 🐹 Hamster PPH: `{convert_big_number(float(cache_db.get('hamster_earn_per_hour')))}`\n"
+        except:
+            pass
 
-        for future in concurrent.futures.as_completed(futures):
-            result = future.result()
-            if isinstance(result, tuple):
-                hamster += result[0]
-                hamster_earn_per_hour += result[1]
-            else:
-                if futures.index(future) % 3 == 0:
-                    tapswap += result
-                else:
-                    cexio += result
+        try:
+            cexio += float(cache_db.get('cex_io_balance'))
+            data += f"User: `{client_id}` | ❣️Cex IO: `{convert_big_number(float(cache_db.get('cex_io_balance')))}`\n\n"
+        except:
+            pass
 
-    return tapswap, hamster, cexio, hamster_earn_per_hour
+    return tapswap, hamster, cexio, hamster_earn_per_hour, data
 
 
 def convert_uptime(uptime):
@@ -267,8 +163,7 @@ def convert_uptime(uptime):
 
 
 def convert_big_number(num):
-    suffixes = ['', 'Thousand', 'Million', 'Billion',
-                'Trillion', 'Quadrillion', 'Quintillion']
+    suffixes = ['', 'Thousand', 'Million', 'Billion', 'Trillion', 'Quadrillion', 'Quintillion']
 
     if num == 0:
         return '0'
@@ -300,6 +195,10 @@ def get_server_usage():
     }
 
 
+def split_string_by_length(input_string, chunk_length):
+    return [input_string[i:i + chunk_length] for i in range(0, len(input_string), chunk_length)]
+
+
 async def answer(event):
     global db, db_steps
 
@@ -310,7 +209,8 @@ async def answer(event):
         return
 
     if text == '/start':
-        await event.reply('👋 Welcome to the Clickers Management Bot! 🤖\n\nTo view the menu, send the command /help. 😉')
+        await event.reply(
+            '👋 Welcome to the Clickers Management Bot! 🤖\n\nTo view the menu, send the command /help. 😉')
 
     elif text == '/ping':
         await event.reply('I am online! 🌐')
@@ -346,8 +246,8 @@ async def answer(event):
 
     elif text == '/balance':
         m = await event.reply('Calculating the inventory. It might take some time ⏳.')
-        tapswap, hamster, cexio, hamster_earn_per_hour = total_balance()
-        await m.edit(f"""Total number of clickers: `{len(clickers)}`
+        tapswap, hamster, cexio, hamster_earn_per_hour, data = total_balance()
+        await m.edit(f"""Total number of clickers: `{len(url_files)}`
 Total inventories:
 
 🤖 Total TapSwap: `{convert_big_number(tapswap)}`
@@ -355,7 +255,7 @@ Total inventories:
 🔗 Total CEX IO:  `{convert_big_number(cexio)}`
 
 🐹 Total Hamster Earn Per Hour:  `{convert_big_number(hamster_earn_per_hour)}`
-🐹 Total Hamster Earn Per Day:   `{convert_big_number(hamster_earn_per_hour*24)}`
+🐹 Total Hamster Earn Per Day:   `{convert_big_number(hamster_earn_per_hour * 24)}`
 """)
 
     elif text == '/help':
@@ -406,22 +306,27 @@ Coded By: @uPaSKaL | GitHub: [Poryaei](https://github.com/Poryaei)
                           """)
 
     elif text == '/version':
-        await event.reply(f"ℹ️ Version: {VERSION}\n\nCoded By: @uPaSKaL | GitHub: [Poryaei](https://github.com/Poryaei)")
+        await event.reply(
+            f"ℹ️ Version: {VERSION}\n\nCoded By: @uPaSKaL | GitHub: [Poryaei](https://github.com/Poryaei)")
 
     elif text == '/stop':
         await event.reply('👋')
         sys.exit()
 
-
-create_clickers()
-start_clickers()
-
-
-@aiocron.crontab('*/5 * * * *')
+@aiocron.crontab('*/1 * * * *')
 async def send_taps():
-    if db['click'] != 'on':
+    global db
+    if db['click'] != 'on' or db['start'] == True:
         return
-    start_clickers()
+    if platform.system() == "Windows":
+        python_command = "python"
+    else:
+        python_command = "python3"
+
+    if not os.path.exists('start.txt'):
+        command = " ".join([python_command, "send_taps.py"])
+        subprocess.Popen(command, shell=True)
+        await client.send_message(admin, "Start Tapping ⛏️")
 
 
 @aiocron.crontab('0 */12 * * *')

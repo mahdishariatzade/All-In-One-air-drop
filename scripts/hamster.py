@@ -30,6 +30,7 @@ class HamsterCombat:
             "Authorization": f"Bearer {self.token}",
             "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13; iPhone 15 Pro Max) AppleWebKit/533.2 (KHTML, like Gecko) Version/122.0 Mobile/15E148 Safari/533.2"
         }
+        
         self.select_exchange()
 
     def wait_time(self, max_taps: int, available_taps: int, taps_recover_per_sec: int):
@@ -194,7 +195,7 @@ class HamsterCombat:
             upgrades = response['upgradesForBuy']
             updates = []
             balance = self.balance_coins()
-            for i in range(1, self.max_days_for_return):
+            for i in range(1, self.max_days_for_return+1):
                 sorted_upgrades = self.find_best_upgrades(upgrades, i)
                 if len(sorted_upgrades) != 0:
                     break
@@ -213,6 +214,8 @@ class HamsterCombat:
                             continue
                         self.logger.debug('[~] Updating: ' + upgrade_to_buy['id'] + ' | x_day_return: ' + str(upgrade_to_buy['x_day_return']))
                         response = self.buy_upgrade(upgrade_to_buy['id'])
+                        if 'error_code' in response and response['error_code']:
+                            continue
                         updates.append(upgrade_to_buy)
                         balance -= upgrade_to_buy['price']
                     else:
@@ -227,6 +230,8 @@ class HamsterCombat:
                         continue
                     self.logger.debug('[~] Updating: ' + upgrade_to_buy['id'] + ' | x_day_return: ' + str(upgrade_to_buy['x_day_return']))
                     response = self.buy_upgrade(upgrade_to_buy['id'])
+                    if 'error_code' in response and response['error_code']:
+                        continue
                     updates.append(upgrade_to_buy)
                     balance -= upgrade_to_buy['price']
                     
@@ -245,7 +250,7 @@ class HamsterCombat:
         availableTaps     = taps['clickerUser']['availableTaps']
         earnPerTap        = taps['clickerUser']['earnPerTap']
         tapsRecoverPerSec = taps['clickerUser']['tapsRecoverPerSec']
-        self.sleep_time   = self.wait_time(maxTaps, availableTaps, tapsRecoverPerSec) + time.time() + (60*random.randint(1, 6))
+        self.sleep_time   = self.wait_time(maxTaps, availableTaps, tapsRecoverPerSec)
         if maxTaps - availableTaps > 50:
             self.logger.debug('[~] Wait for full charge')
             return
@@ -268,11 +273,11 @@ class HamsterCombat:
             
             time.sleep(random.randint(1, 2))
         
-        self.logger.info(f'Clicks were successful! | Total clicks: {total_taps} | Balance growth: (+{total_taps*earnPerTap})')
-        
-        self.sleep_time = self.wait_time(maxTaps, availableTaps, tapsRecoverPerSec) + time.time() + (60*random.randint(1, 6))
-        
+        self.logger.info(f'Clicks were successful! | Total clicks: {total_taps} | Balance growth: (+{total_taps*earnPerTap})')        
         if self.check_boosts():
             return self.tap_all()
         
         return self.sleep_time + time.time() + (60*random.randint(1, 6))
+    
+    def time_to_recharge(self):
+        return self.sleep_time + (60*random.randint(1, 6))
