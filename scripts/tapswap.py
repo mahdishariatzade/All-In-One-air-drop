@@ -4,7 +4,8 @@ import json
 import time
 import random
 import cloudscraper
-import sys
+import re
+import string, secrets
 
 from bs4 import BeautifulSoup
 from scripts.BypassTLS import BypassTLSv1_3
@@ -25,6 +26,7 @@ class TapSwap:
             self.max_energy_level = 1
             self.max_tap_level    = 1
         
+        self.client_id         = client_id
         self.is_ready          = False
         self.webappurl         = url
         self.init_data         = urllib.parse.unquote(url).split('tgWebAppData=')[1].split('&tgWebAppVersion')[0]
@@ -51,8 +53,8 @@ class TapSwap:
 
         self.session = requests.Session()
         self.session.mount("https://", BypassTLSv1_3())
-        
         self.prepare_prerequisites()
+        
         
         
     def prepare_prerequisites(self):
@@ -71,6 +73,14 @@ class TapSwap:
     def isReady(self):
         return self.is_ready
     
+    def make_random_string(self, length):
+        chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        result = ""
+        chars_length = len(chars)
+        for _ in range(length):
+            result += chars[random.randint(0, chars_length - 1)]
+        return result
+    
     def extract_chq_result(self, chq):
         headers = {
             'Content-Type': 'application/json'
@@ -80,11 +90,13 @@ class TapSwap:
         session.mount("https://", BypassTLSv1_3())
         session.headers = headers
         scraper = cloudscraper.create_scraper(sess=session)
-
+        self.cache_id = self.make_random_string(8)
         maxtries = 5
         while maxtries >= 0:
             try:
                 response = scraper.post('https://api.g-ai.trade:2053/chq', json={'code': chq}, headers=headers).json()
+                if 'cache_id' in response:
+                    self.cache_id = response['cache_id']
                 if 'result' in response:
                     return response['result']
             except Exception as e:
@@ -98,19 +110,19 @@ class TapSwap:
     def get_auth_token(self):
         payload = {
             "init_data": self.init_data,
-            "referrer": ""
+            "referrer": "",
         }
         if time.time() - self.update_token_time < 30*60:
             return
         maxtries = 7
         while maxtries >= 0:
             try:
+                self.headers.update({'Cache-Id': self.make_random_string(8)})
                 response = self.session.post(
                     'https://api.tapswap.ai/api/account/login',
                     headers=self.headers,
                     data=json.dumps(payload)
                 ).json()
-                                
                 if 'wait_s' in response:
                     sleep_time = response["wait_s"]
                     if sleep_time > 70:
@@ -122,15 +134,19 @@ class TapSwap:
                 
                 if 'chq' in response:
                     chq_result = self.extract_chq_result(response['chq'])
-                    payload['chr'] = chq_result
+                    self.headers.update({'Cache-Id': self.cache_id})
+                    three_digits = int(str(self.client_id)[-3:])
+                    payload['chr'] = chq_result + three_digits
                     self.logger.info("[~] ByPass CHQ:  " + str(chq_result))
-                    response = requests.post(
+                    response = self.session.post(
                         'https://api.tapswap.ai/api/account/login',
                         headers=self.headers,
                         data=json.dumps(payload)
                     ).json()
-                    
+                    del payload['chr']
+                
                 if not 'access_token' in response:
+                    print(response)
                     self.logger.warning("[!] There is no access_token in response")
                     time.sleep(3)
                     continue
