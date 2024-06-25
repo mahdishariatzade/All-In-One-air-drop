@@ -21,5 +21,3 @@ client = TelegramClient(
 with client:
     session = client.session.save()
     print(session)
-    # client.start()
-    # client.send_message(admin, session)
