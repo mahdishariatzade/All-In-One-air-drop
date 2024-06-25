@@ -4,6 +4,10 @@ from tools.db.cache_data import SimpleCache
 from tools.converts import convert_big_number
 import os
 
+import os
+if not os.path.exists('databases'):
+    os.makedirs('databases')
+
 url_files = [f.split('.')[0] for f in os.listdir('databases') if f.endswith('.db')]
 
 

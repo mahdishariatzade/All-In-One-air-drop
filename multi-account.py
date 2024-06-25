@@ -14,9 +14,6 @@ from tools.scheduler import scheduler
 from tools.statistics import total_balance, get_server_usage
 from tools.statistics import url_files
 
-import os
-if not os.path.exists('databases'):
-    os.makedirs('databases')
 logger = setup_custom_logger("mainapp")
 
 scheduler.add_job(hamster_do_tasks, "interval", hours=12, name='daily_reward', id="daily_reward")
