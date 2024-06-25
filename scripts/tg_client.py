@@ -3,8 +3,9 @@ import time
 from telethon.sync import TelegramClient
 from telethon.sync import functions
 from telethon.tl.types import InputBotAppShortName
-from telethon.sessions import StringSession
-from scripts.cache_data import SimpleCache
+
+from telegram.create_client import create_telegram_client
+from tools.db.cache_data import SimpleCache
 
 
 def getUrl(client: TelegramClient, peer: str, bot: str, url: str, platform: str = "ios", start_param: str = ""):
@@ -20,7 +21,8 @@ def getUrl(client: TelegramClient, peer: str, bot: str, url: str, platform: str 
     )
 
 
-def getAppUrl(client: TelegramClient, bot: str, platform: str = "ios", start_param: str = "", short_name: str = "start"):
+def getAppUrl(client: TelegramClient, bot: str, platform: str = "ios", start_param: str = "",
+              short_name: str = "start"):
     return client(
         functions.messages.RequestAppWebViewRequest(
             peer="me",
@@ -33,12 +35,7 @@ def getAppUrl(client: TelegramClient, bot: str, platform: str = "ios", start_par
 
 
 def create_client(sessionString, api_id, api_hash, admin, cexio_ref_code):
-    client = TelegramClient(
-        StringSession(sessionString),
-        api_id,
-        api_hash,
-        device_model=f"All-In-One(MA)"
-    )
+    client = create_telegram_client(sessionString, api_id, api_hash)
 
     client.start()
 
@@ -86,9 +83,5 @@ def create_client(sessionString, api_id, api_hash, admin, cexio_ref_code):
 
         cache_db.set('cex_io_url', cex_io_url)
         time.sleep(6)
-
-    tapswap_url = cache_db.get('tapswap_url')
-    hamster_url = cache_db.get('hamster_url')
-    cex_io_url = cache_db.get('cex_io_url')
 
     client.disconnect()

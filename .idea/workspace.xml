@@ -5,20 +5,50 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e73dd2ce-afcf-4b28-869a-51a027275051" name="Changes" comment="sync">
-      <change beforePath="$PROJECT_DIR$/scripts/tapswap.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tapswap.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/airdrops/hamster/hamster_functions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/telegram/bot_client.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/telegram/bot_handlers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/telegram/create_client.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools/converts.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools/scheduler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools/statistics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/multi-account.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi-account.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/cache_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/db/cache_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/cexio.py" beforeDir="false" afterPath="$PROJECT_DIR$/airdrops/cexio/cexio.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/hamster.py" beforeDir="false" afterPath="$PROJECT_DIR$/airdrops/hamster/hamster.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/logger.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/tapswap.py" beforeDir="false" afterPath="$PROJECT_DIR$/airdrops/tapswap/tapswap.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/tg_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tg_client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/send_taps.py" beforeDir="false" afterPath="$PROJECT_DIR$/send_taps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/configs.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/configs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/sessionStringSaver.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/sessionStringSaver.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="Poryaei-main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -28,23 +58,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Poryaei-main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/WORK/dalghak/dalghak_vpn/All-In-One-air-drop&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ssh.settings&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/WORK/dalghak/dalghak_vpn/All-In-One-air-drop/airdrops/hamster/hamster_functions.py",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ssh.settings",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\WORK\dalghak\dalghak_vpn\All-In-One-air-drop\tools\db\" />
+      <recent name="D:\WORK\dalghak\dalghak_vpn\All-In-One-air-drop\tools" />
+      <recent name="D:\WORK\dalghak\dalghak_vpn\All-In-One-air-drop\airdrops\tapswap" />
+      <recent name="D:\WORK\dalghak\dalghak_vpn\All-In-One-air-drop\airdrops\cexio" />
+      <recent name="D:\WORK\dalghak\dalghak_vpn\All-In-One-air-drop\airdrops\hamster" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -60,7 +99,11 @@
       <workItem from="1718793221655" duration="802000" />
       <workItem from="1718794450512" duration="895000" />
       <workItem from="1718795917789" duration="57000" />
-      <workItem from="1719170691670" duration="321000" />
+      <workItem from="1719170691670" duration="1131000" />
+      <workItem from="1719172280573" duration="1639000" />
+      <workItem from="1719176583102" duration="572000" />
+      <workItem from="1719253654042" duration="1822000" />
+      <workItem from="1719264283446" duration="24819000" />
     </task>
     <task id="LOCAL-00001" summary="sync">
       <option name="closed" value="true" />
@@ -103,5 +146,29 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="sync" />
     <option name="LAST_COMMIT_MESSAGE" value="sync" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/telegram/bot_handlers.py</url>
+          <option name="timeStamp" value="84" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tools/statistics.py</url>
+          <option name="timeStamp" value="97" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="time.time() &lt; next_cexio_click" language="Python" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/All_In_One_air_drop$multi_account.coverage" NAME="multi-account Coverage Results" MODIFIED="1719309452075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/All_In_One_air_drop$send_taps.coverage" NAME="send_taps Coverage Results" MODIFIED="1719277908891" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/All_In_One_air_drop$cache_data.coverage" NAME="cache_data Coverage Results" MODIFIED="1719268382130" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
   </component>
 </project>

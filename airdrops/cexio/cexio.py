@@ -3,7 +3,7 @@ import urllib
 import time
 from datetime import datetime
 
-from scripts.logger import setup_custom_logger
+from tools.logger import setup_custom_logger
 
 class Cex_IO:
     def __init__(self, url, admin:int=1):

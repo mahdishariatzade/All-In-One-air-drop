@@ -10,9 +10,7 @@ with open('config.json') as f:
     data = json.load(f)
     api_id = getenv_json_config('api_id')
     api_hash = getenv_json_config('api_hash')
-    # sessionString = getenv_json_config('sessionString')
     admin = int(getenv_json_config('admin'))
-    version = getenv_json_config('version')
     auto_upgrade = getenv_json_config('auto_upgrade')
     max_tap_level = int(getenv_json_config('max_tap_level'))
     max_charge_level = int(getenv_json_config('max_charge_level'))
@@ -23,3 +21,6 @@ with open('config.json') as f:
     hamster_clicker = getenv_json_config('hamster_clicker')
     cexio_ref_code = getenv_json_config('cexio_ref_code')
     bot_token = getenv_json_config('bot_token')
+    accounts = getenv_json_config('accounts').split(',')
+
+VERSION = "1.1"

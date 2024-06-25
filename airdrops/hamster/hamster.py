@@ -4,7 +4,7 @@ import time
 import random
 from datetime import datetime, timedelta
 
-from scripts.logger import setup_custom_logger
+from tools.logger import setup_custom_logger
 
 class HamsterCombat:
     def __init__(self, url, max_days_for_return: int, client_id:int=1) -> None:

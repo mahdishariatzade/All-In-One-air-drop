@@ -4,12 +4,9 @@ import json
 import time
 import random
 import cloudscraper
-import re
-import string, secrets
 
-from bs4 import BeautifulSoup
 from scripts.BypassTLS import BypassTLSv1_3
-from scripts.logger import setup_custom_logger
+from tools.logger import setup_custom_logger
 
 
 class TapSwap:
