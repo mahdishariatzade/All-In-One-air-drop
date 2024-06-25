@@ -18,14 +18,6 @@ logger = setup_custom_logger("mainapp")
 
 scheduler.add_job(hamster_do_tasks, "interval", hours=12, name='daily_reward', id="daily_reward")
 
-for session in accounts:
-    create_client(session, api_id, api_hash, admin, cexio_ref_code)
-logger.info('create clients')
-
-for file in url_files:
-    job = scheduler.add_job(connect, "interval", seconds=60, args=[file])
-logger.info('create jobs')
-
 clickers = {}
 START_TIME = time.time()
 db = {
@@ -132,6 +124,18 @@ async def handler(event):
 🟠 `/cipher `CIPHER - Claim daily cipher ( `/cipher BTC` )
 """)
 
+
+for session in accounts:
+    create_client(session, api_id, api_hash, admin, cexio_ref_code)
+logger.info('clients created')
+client.send_message(admin, "clients created")
+
+for file in url_files:
+    job = scheduler.add_job(connect, "interval", seconds=60, args=[file])
+logger.info('jobs created')
+client.send_message(admin, "jobs created")
+
 logger.info('starting jobs')
+
 scheduler.start()
 client.run_until_disconnected()

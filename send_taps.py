@@ -6,6 +6,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from airdrops.cexio.cexio import Cex_IO
 from airdrops.hamster.hamster import HamsterCombat
 from airdrops.tapswap.tapswap import TapSwap
+from telegram.bot_client import client
 from tools.configs import *
 from tools.db.cache_data import SimpleCache
 from tools.logger import setup_custom_logger
@@ -18,6 +19,7 @@ async def connect(file):
     try:
         client_id = file.split('.json')[0]
         logger.debug("Starting: " + client_id)
+        client.send_message(admin,"Starting: " + client_id)
         cache_db = SimpleCache(client_id)
 
         tapswap_url = cache_db.get('tapswap_url')
