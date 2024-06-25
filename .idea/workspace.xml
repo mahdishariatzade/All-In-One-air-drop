@@ -4,28 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e73dd2ce-afcf-4b28-869a-51a027275051" name="Changes" comment="sync">
-      <change afterPath="$PROJECT_DIR$/airdrops/hamster/hamster_functions.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/telegram/bot_client.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/telegram/bot_handlers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/telegram/create_client.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/converts.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/scheduler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/statistics.py" afterDir="false" />
+    <list default="true" id="e73dd2ce-afcf-4b28-869a-51a027275051" name="Changes" comment="update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/multi-account.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi-account.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/cache_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/db/cache_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/cexio.py" beforeDir="false" afterPath="$PROJECT_DIR$/airdrops/cexio/cexio.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/hamster.py" beforeDir="false" afterPath="$PROJECT_DIR$/airdrops/hamster/hamster.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/logger.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/tapswap.py" beforeDir="false" afterPath="$PROJECT_DIR$/airdrops/tapswap/tapswap.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/tg_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/tg_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/send_taps.py" beforeDir="false" afterPath="$PROJECT_DIR$/send_taps.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/configs.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/configs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tools/sessionStringSaver.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/sessionStringSaver.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +47,7 @@
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/WORK/dalghak/dalghak_vpn/All-In-One-air-drop/airdrops/hamster/hamster_functions.py",
+    "last_opened_file_path": "D:/WORK/dalghak/dalghak_vpn/All-In-One-air-drop",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -76,6 +58,9 @@
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\WORK\dalghak\dalghak_vpn\All-In-One-air-drop" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\WORK\dalghak\dalghak_vpn\All-In-One-air-drop\tools\db\" />
       <recent name="D:\WORK\dalghak\dalghak_vpn\All-In-One-air-drop\tools" />
@@ -103,7 +88,7 @@
       <workItem from="1719172280573" duration="1639000" />
       <workItem from="1719176583102" duration="572000" />
       <workItem from="1719253654042" duration="1822000" />
-      <workItem from="1719264283446" duration="24819000" />
+      <workItem from="1719264283446" duration="25842000" />
     </task>
     <task id="LOCAL-00001" summary="sync">
       <option name="closed" value="true" />
@@ -137,7 +122,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719171008719</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="update">
+      <option name="closed" value="true" />
+      <created>1719310474297</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1719310474297</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -145,7 +138,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="sync" />
-    <option name="LAST_COMMIT_MESSAGE" value="sync" />
+    <MESSAGE value="update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
